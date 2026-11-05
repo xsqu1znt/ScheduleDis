@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #17181c;
+  --color-panel: #1f2126;
+  --color-field: #2a2c33;
+  --color-field-hover: #33353d;
+  --color-line: #33353d;
+  --color-ink: #f2f3f5;
+  --color-muted: #a3a6af;
+  --color-faint: #767a85;
+  --color-accent: #5865f2;
+  --color-accent-hover: #4752c4;
+  --color-good: #3ba55d;
+  --color-warn: #f0b232;
+  --color-bad: #f2616d;
+  --font-sans: "gg sans", "Noto Sans", system-ui, sans-serif;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  width: 360px;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+input[type="number"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}
