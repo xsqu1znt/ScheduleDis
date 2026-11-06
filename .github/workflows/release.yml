@@ -1,5 +1,8 @@
-# Builds the public ScheduleDis.zip from a version tag and publishes it as a GitHub release.
-# `pnpm release` pushes the tag. The README's download link and the in-app updater rely on the zip keeping this name.
+# Builds both browsers' files from a version tag, signs the Firefox one, and publishes them as a GitHub release.
+# `pnpm release` pushes the tag. These names must stay the same:
+# - ScheduleDis.zip: the README's download link and the in-app updater.
+# - ScheduleDis-firefox.xpi: the README's download link.
+# - updates.json: the update_url installed Firefox add-ons check, which an update can't change for old installs.
 name: Release
 
 on:
@@ -30,10 +33,11 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm build:firefox
 
       - name: Check the tag matches the built version
         run: |
-          for file in package.json dist/manifest.json; do
+          for file in package.json dist/manifest.json dist-firefox/manifest.json; do
             version=$(node -p "require('./$file').version")
             if [ "v$version" != "$TAG" ]; then
               echo "::error::$file says $version but the tag is $TAG"
@@ -45,6 +49,24 @@ jobs:
       - name: Create the zip
         run: cd dist && zip -qr ../ScheduleDis.zip .
 
+      - name: Check the Firefox build
+        run: npx --yes web-ext@10.8.0 lint --source-dir dist-firefox --self-hosted
+
+      # Unlisted means Mozilla signs it without a store page. It signs each version number only once, so if a
+      # later step fails, release a new version rather than rerunning this. Mozilla may ask for the source when
+      # it reviews a bundled add-on, so it's sent along.
+      - name: Sign the Firefox add-on
+        run: |
+          git archive --format=zip -o source.zip HEAD
+          npx --yes web-ext@10.8.0 sign --source-dir dist-firefox --channel unlisted --artifacts-dir signed --upload-source-code source.zip
+          mv signed/*.xpi ScheduleDis-firefox.xpi
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.AMO_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+
+      - name: Write the Firefox update file
+        run: node scripts/firefox-updates.mjs
+
       - name: Write the release notes
         run: |
           previous=$(git describe --tags --abbrev=0 --match 'v*' "$TAG^" 2>/dev/null || true)
@@ -52,6 +74,6 @@ jobs:
           git log "$range" --no-merges --pretty='- %s' --invert-grep --grep='^chore(release):' > notes.md
 
       - name: Publish the release
-        run: gh release create "$TAG" ScheduleDis.zip --verify-tag --title "$TAG" --notes-file notes.md
+        run: gh release create "$TAG" ScheduleDis.zip ScheduleDis-firefox.xpi updates.json --verify-tag --title "$TAG" --notes-file notes.md
         env:
           GH_TOKEN: ${{ github.token }}

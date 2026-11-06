@@ -1,6 +1,6 @@
 // Starts a release: `pnpm release [--patch | --minor | --major]`. Defaults to a patch bump.
 // Checks the repo, runs the tests and build, bumps the version, then pushes a commit and tag.
-// The tag triggers .github/workflows/release.yml, which builds the public zip on GitHub.
+// The tag triggers .github/workflows/release.yml, which builds, signs and publishes both browsers' files on GitHub.
 // The first release uses the current version as is, unless a flag asks for a bump.
 
 import { execFileSync } from "node:child_process";
@@ -10,7 +10,7 @@ const OPTIONS = {
   branch: "main",
   remote: "origin",
   versionFiles: ["package.json", "public/manifest.json"],
-  builtManifest: "dist/manifest.json",
+  builtManifests: ["dist/manifest.json", "dist-firefox/manifest.json"],
   bumps: ["patch", "minor", "major"],
 };
 
@@ -107,6 +107,7 @@ function main() {
   try {
     run("pnpm", "test");
     run("pnpm", "build");
+    run("pnpm", "build:firefox");
   } catch {
     fail("the tests or build failed. Nothing was changed.");
   }
@@ -114,8 +115,8 @@ function main() {
   // --- Bump, tag and push ---
   if (bump) {
     for (const file of OPTIONS.versionFiles) writeVersion(file, version);
-    // The build above copied the old manifest, and dist isn't committed, so it's updated separately.
-    writeVersion(OPTIONS.builtManifest, version);
+    // The builds above wrote the old version, and they aren't committed, so they're updated separately.
+    for (const file of OPTIONS.builtManifests) writeVersion(file, version);
     run("git", "add", ...OPTIONS.versionFiles);
     run("git", "commit", "--quiet", "-m", `chore(release): ${tag}`);
   }
