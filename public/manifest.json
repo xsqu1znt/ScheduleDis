@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Mass Schedule for Discord",
+  "name": "ScheduleDis",
   "version": "1.0.0",
-  "description": "Queue up a run of Discord scheduled messages at a fixed interval, in one click.",
+  "description": "Improves Discord's new scheduled message system.",
   "permissions": ["scripting", "storage"],
   "host_permissions": ["https://discord.com/*", "https://ptb.discord.com/*", "https://canary.discord.com/*"],
   "action": {
