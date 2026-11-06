@@ -10,6 +10,7 @@ const OPTIONS = {
   branch: "main",
   remote: "origin",
   versionFiles: ["package.json", "public/manifest.json"],
+  builtManifest: "dist/manifest.json",
   bumps: ["patch", "minor", "major"],
 };
 
@@ -113,6 +114,8 @@ function main() {
   // --- Bump, tag and push ---
   if (bump) {
     for (const file of OPTIONS.versionFiles) writeVersion(file, version);
+    // The build above copied the old manifest, and dist isn't committed, so it's updated separately.
+    writeVersion(OPTIONS.builtManifest, version);
     run("git", "add", ...OPTIONS.versionFiles);
     run("git", "commit", "--quiet", "-m", `chore(release): ${tag}`);
   }
