@@ -15,7 +15,7 @@ type StartMode = StartChoice["mode"];
 export interface ScheduleForm {
   /** A preset's channel, shown instead of the open one. */
   override: Target | null;
-  /** Null means as many as fit. */
+  /** Null means untouched: the default count, or as many as fit if fewer are free. */
   count: number | null;
   chosenMode: Exclude<StartMode, "after-last"> | null;
   delayMin: number | null;
@@ -41,6 +41,7 @@ interface ScheduleTabProps {
 export const EMPTY_FORM: ScheduleForm = { override: null, count: null, chosenMode: null, delayMin: null, clock: "" };
 
 const OPTIONS = {
+  defaultCount: 10,
   maxIntervalMin: 24 * 60,
   // A finished run's result stays on screen this long, in case the popup was closed while it ran.
   resultVisibleMs: 5 * 60_000,
@@ -110,6 +111,7 @@ export function ScheduleTab(props: ScheduleTabProps) {
   const intervalMs = spacingMs(draft.intervalMin, bufferSec);
   const delayMin = form.delayMin ?? Math.max(MIN_FIRST_SEND_MIN, Math.ceil(intervalMs / 60_000));
   const slotsFree = Math.max(0, limit - queue.length);
+  const count = form.count ?? Math.min(OPTIONS.defaultCount, slotsFree);
   const lastQueued = target ? lastQueuedAt(queue, target.channelId, draft.content) : null;
   const hasLast = lastQueued !== null;
 
@@ -118,7 +120,7 @@ export function ScheduleTab(props: ScheduleTabProps) {
   const start: StartChoice = mode === "time" ? { mode, time: form.clock } : mode === "after-last" ? { mode } : { mode: "delay", minutes: delayMin };
 
   const planFor = (at: number) =>
-    buildPlan({ now: at, first: resolveFirstSend(start, at, lastQueued, intervalMs), intervalMs, count: form.count, slotsFree });
+    buildPlan({ now: at, first: resolveFirstSend(start, at, lastQueued, intervalMs), intervalMs, count, slotsFree });
 
   const plan = mode === "time" && form.clock === "" ? null : planFor(now);
   const times = plan?.times ?? [];
@@ -132,12 +134,12 @@ export function ScheduleTab(props: ScheduleTabProps) {
   // --- Slider. One or no free slots use a 0 to 1 range, since a range with min equal to max parks its thumb on the left ---
   const countMax = Math.max(1, slotsFree);
   const countMin = slotsFree <= 1 ? 0 : 1;
-  const countValue = Math.min(form.count ?? slotsFree, countMax);
+  const countValue = Math.min(count, countMax);
 
   // --- Preset for the current setup ---
   const preset: Preset | null =
     target && draft.content.trim() !== ""
-      ? { ...target, content: draft.content, count: form.count ?? Math.max(1, slotsFree), intervalMin: draft.intervalMin, bufferSec }
+      ? { ...target, content: draft.content, count: Math.max(1, count), intervalMin: draft.intervalMin, bufferSec }
       : null;
 
   // --- Alerts: only what actually needs attention ---
@@ -214,7 +216,7 @@ export function ScheduleTab(props: ScheduleTabProps) {
               max={countMax}
               nitroFrom={nitro ? BASE_SLOTS : undefined}
               disabled={slotsFree <= 1}
-              onChange={value => setForm({ count: value >= slotsFree ? null : value })}
+              onChange={value => setForm({ count: value })}
             />
           </div>
         </section>
