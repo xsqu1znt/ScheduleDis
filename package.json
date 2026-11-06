@@ -6,7 +6,9 @@
   "packageManager": "pnpm@11.17.0",
   "scripts": {
     "dev": "vite build --watch",
+    "dev:firefox": "vite build --watch --mode firefox",
     "build": "tsc --noEmit && vite build",
+    "build:firefox": "tsc --noEmit && vite build --mode firefox",
     "test": "vitest run",
     "release": "node scripts/release.mjs"
   },

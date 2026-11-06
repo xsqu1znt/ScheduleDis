@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { findUpdate, type Release } from "../lib/update";
 import { DownloadIcon } from "./icons";
 
+declare const __TARGET__: "chrome" | "firefox";
+
 /** Shows when a newer release exists and opens the update page. Renders nothing otherwise. */
-export function UpdateButton({ className = "" }: { className?: string }) {
+function InAppUpdateButton({ className = "" }: { className?: string }) {
   const [release, setRelease] = useState<Release | null>(null);
 
   useEffect(() => {
@@ -30,3 +32,6 @@ export function UpdateButton({ className = "" }: { className?: string }) {
     </button>
   );
 }
+
+// Firefox updates add-ons by itself. Choosing here at build time also leaves the updater out of its bundle.
+export const UpdateButton = __TARGET__ === "firefox" ? () => null : InAppUpdateButton;

@@ -69,6 +69,18 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
   }
+
+  /* Firefox only. Chrome would let these standard properties switch off the styling above. */
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+    }
+
+    input[type="number"] {
+      appearance: textfield;
+    }
+  }
 }
 
 /* --- Slider: the input sits on top and only draws its thumb --- */
@@ -124,7 +136,25 @@
   transition: transform 0.12s;
 }
 
+.slider input::-moz-range-thumb {
+  width: var(--thumb);
+  height: var(--thumb);
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  transition: transform 0.12s;
+}
+
+.slider input::-moz-range-track {
+  background: transparent;
+}
+
 .slider input:active:not(:disabled)::-webkit-slider-thumb {
+  transform: scale(1.15);
+}
+
+.slider input:active:not(:disabled)::-moz-range-thumb {
   transform: scale(1.15);
 }
 
@@ -133,6 +163,11 @@
 }
 
 .slider input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.slider input:focus-visible::-moz-range-thumb {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
