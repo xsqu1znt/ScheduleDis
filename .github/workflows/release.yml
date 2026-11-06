@@ -1,0 +1,57 @@
+# Builds the public ScheduleDis.zip from a version tag and publishes it as a GitHub release.
+# `pnpm release` pushes the tag. The README's download link relies on the zip keeping this name.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.ref_name }}
+    steps:
+      # The full history is needed to find the previous tag for the release notes.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - run: pnpm build
+
+      - name: Check the tag matches the built version
+        run: |
+          for file in package.json dist/manifest.json; do
+            version=$(node -p "require('./$file').version")
+            if [ "v$version" != "$TAG" ]; then
+              echo "::error::$file says $version but the tag is $TAG"
+              exit 1
+            fi
+          done
+
+      # Files sit at the top of the zip, so unzipping gives one folder holding manifest.json.
+      - name: Create the zip
+        run: cd dist && zip -qr ../ScheduleDis.zip .
+
+      - name: Write the release notes
+        run: |
+          previous=$(git describe --tags --abbrev=0 --match 'v*' "$TAG^" 2>/dev/null || true)
+          range=${previous:+$previous..}$TAG
+          git log "$range" --no-merges --pretty='- %s' --invert-grep --grep='^chore(release):' > notes.md
+
+      - name: Publish the release
+        run: gh release create "$TAG" ScheduleDis.zip --verify-tag --title "$TAG" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}
