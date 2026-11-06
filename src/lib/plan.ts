@@ -28,6 +28,12 @@ export const RULES = {
   marginMs: MINUTE,
 } as const;
 
+/** Soonest wait to offer for the first send, in minutes. Anything sooner gets moved by `buildPlan` anyway. */
+export const MIN_FIRST_SEND_MIN = (RULES.minLeadMs + RULES.marginMs) / MINUTE;
+
+/** Slots on an account without Nitro. A higher limit from Discord means the account has Nitro. */
+export const BASE_SLOTS = 10;
+
 /**
  * Gap between sends: the bot's cooldown plus a buffer. Every gap includes the buffer, so it stacks:
  * 30 min + 60 sec gives 12:30, 1:01, 1:32.

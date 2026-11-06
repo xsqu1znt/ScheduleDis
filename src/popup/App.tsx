@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { DISCORD_APP_URL } from "../lib/bridge";
+import { BASE_SLOTS } from "../lib/plan";
+import type { Preset } from "../lib/storage";
+import { PresetsTab } from "./PresetsTab";
 import { QueueTab } from "./QueueTab";
-import { ScheduleTab } from "./ScheduleTab";
+import { EMPTY_FORM, ScheduleTab, type ScheduleForm } from "./ScheduleTab";
+import { useDraft } from "./useDraft";
 import { usePage } from "./usePage";
 
-type Tab = "schedule" | "queued";
+type Tab = "schedule" | "presets" | "queued";
 
 function Message({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
@@ -17,7 +21,9 @@ function Message({ title, children }: { title: string; children?: React.ReactNod
 
 export function App() {
   const connection = usePage();
+  const [draft, update] = useDraft();
   const [tab, setTab] = useState<Tab>("schedule");
+  const [form, setFormState] = useState<ScheduleForm>(EMPTY_FORM);
 
   if (connection.state === "connecting") return <Message title="Connecting to Discord…" />;
   if (connection.state === "error") return <Message title="Couldn't reach the Discord tab">{connection.message}</Message>;
@@ -39,30 +45,64 @@ export function App() {
   if (snapshot.limit === 0) {
     return <Message title="Scheduled messages aren't on for this account">Discord rolls this feature out per account.</Message>;
   }
+  if (!draft) return null;
 
   const now = Date.now();
-  const tabClass = (t: Tab) =>
-    `-mb-px border-b-2 px-1 pb-2 text-sm font-medium ${tab === t ? "border-accent text-ink" : "text-muted hover:text-ink border-transparent"}`;
+  const setForm = (patch: Partial<ScheduleForm>) => setFormState(current => ({ ...current, ...patch }));
+
+  const loadPreset = (p: Preset) => {
+    const { channelId, channelName, guildName } = p;
+    setForm({ override: { channelId, channelName, guildName }, count: Math.min(p.count, snapshot.limit), chosenMode: null, delayMin: null });
+    update({ content: p.content, intervalMin: p.intervalMin, bufferOn: p.bufferSec > 0, ...(p.bufferSec > 0 && { bufferSec: p.bufferSec }) });
+    setTab("schedule");
+  };
+
+  const tabButton = (t: Tab, label: string, count?: number) => (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={tab === t}
+      className={`-mb-px border-b-2 px-0.5 pb-2 font-medium ${tab === t ? "border-accent text-ink" : "text-muted hover:text-ink border-transparent"}`}
+      onClick={() => setTab(t)}
+    >
+      {label}
+      {count ? <span className="text-faint ml-1.5 text-[11px]">{count}</span> : null}
+    </button>
+  );
 
   return (
-    <div className="flex max-h-[600px] flex-col p-3.5">
-      <header className="border-line mb-3.5 flex shrink-0 items-center gap-4 border-b">
-        <button type="button" className={tabClass("schedule")} onClick={() => setTab("schedule")}>
-          Schedule
-        </button>
-        <button type="button" className={tabClass("queued")} onClick={() => setTab("queued")}>
-          Queued
-        </button>
-        <span className="text-muted ml-auto pb-2 text-xs tabular-nums">
-          {snapshot.queue.length} of {snapshot.limit} slots used
+    <div className="relative isolate flex max-h-[600px] flex-col overflow-hidden">
+      <header className="border-line relative z-10 mx-3.5 flex shrink-0 items-center gap-4 border-b pt-3">
+        {tabButton("schedule", "Schedule")}
+        {tabButton("presets", "Presets", draft.presets.length)}
+        {tabButton("queued", "Queued", snapshot.queue.length)}
+        <span className="text-muted ml-auto flex items-center gap-1.5 pb-2 text-xs tabular-nums">
+          {snapshot.limit > BASE_SLOTS && <img src="icons/nitro.png" alt="Nitro" className="size-4" />}
+          {snapshot.queue.length} of {snapshot.limit} slots
         </span>
       </header>
 
-      {tab === "schedule" ? (
-        <ScheduleTab tabId={tabId} now={now} limit={snapshot.limit} current={snapshot.current} queue={snapshot.queue} job={snapshot.job} sendsAvailable={snapshot.sendsAvailable} refillMs={snapshot.refillMs} />
-      ) : (
-        <QueueTab tabId={tabId} now={now} queue={snapshot.queue} loaded={snapshot.queueLoaded} />
+      {tab === "schedule" && (
+        <ScheduleTab
+          tabId={tabId}
+          now={now}
+          limit={snapshot.limit}
+          current={snapshot.current}
+          queue={snapshot.queue}
+          job={snapshot.job}
+          sendsAvailable={snapshot.sendsAvailable}
+          refillMs={snapshot.refillMs}
+          draft={draft}
+          update={update}
+          form={form}
+          setForm={setForm}
+          onOpenQueued={() => setTab("queued")}
+        />
       )}
+      {tab === "presets" && (
+        <PresetsTab presets={draft.presets} onLoad={loadPreset} onRemove={p => update({ presets: draft.presets.filter(other => other !== p) })} />
+      )}
+      {tab === "queued" && <QueueTab tabId={tabId} now={now} queue={snapshot.queue} loaded={snapshot.queueLoaded} />}
     </div>
   );
 }

@@ -26,21 +26,28 @@ export function formatInterval(ms: number) {
     .join(" ");
 }
 
-/**
- * Clock time, with the day added when it isn't today: "3:42 PM", "Tomorrow 3:42 PM", "Sat 3:42 PM".
- * Seconds only appear when they aren't zero, so a seconds buffer shows the real send time.
- */
-export function formatSendTime(at: number, now: number) {
+/** Clock time. Seconds only appear when they aren't zero, so a seconds buffer shows the real send time. */
+export function formatClock(at: number) {
   const hasSeconds = new Date(at).getSeconds() !== 0;
-  const clock = new Date(at).toLocaleTimeString([], {
+  return new Date(at).toLocaleTimeString([], {
     hour: "numeric",
     minute: "2-digit",
     ...(hasSeconds && { second: "2-digit" }),
   });
+}
+
+/** Which day a time falls on, relative to now: "Today", "Tomorrow" or "Sat". */
+export function formatDay(at: number, now: number) {
   const dayStart = (ms: number) => new Date(ms).setHours(0, 0, 0, 0);
   const days = Math.round((dayStart(at) - dayStart(now)) / (24 * 60 * MINUTE));
 
-  if (days === 0) return clock;
-  if (days === 1) return `Tomorrow ${clock}`;
-  return `${new Date(at).toLocaleDateString([], { weekday: "short" })} ${clock}`;
+  if (days === 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return new Date(at).toLocaleDateString([], { weekday: "short" });
+}
+
+/** Clock time, with the day added when it isn't today: "3:42 PM", "Tomorrow 3:42 PM", "Sat 3:42 PM". */
+export function formatSendTime(at: number, now: number) {
+  const day = formatDay(at, now);
+  return day === "Today" ? formatClock(at) : `${day} ${formatClock(at)}`;
 }

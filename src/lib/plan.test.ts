@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPlan, lastQueuedAt, resolveFirstSend, RULES, spacingMs } from "./plan";
+import { buildPlan, lastQueuedAt, MIN_FIRST_SEND_MIN, resolveFirstSend, RULES, spacingMs } from "./plan";
 import type { QueuedMessage } from "./types";
 
 const MIN = 60_000;
@@ -20,6 +20,11 @@ function queued(overrides: Partial<QueuedMessage>): QueuedMessage {
 }
 
 describe("resolveFirstSend", () => {
+  it("keeps the shortest offered wait inside Discord's window, so it never gets moved", () => {
+    const first = resolveFirstSend({ mode: "delay", minutes: MIN_FIRST_SEND_MIN }, NOW, null, 31 * MIN);
+    expect(buildPlan({ now: NOW, first, intervalMs: 31 * MIN, count: 1, slotsFree: 1 }).firstMoved).toBe(false);
+  });
+
   it("rounds a delay up to the minute so the shown time is never early", () => {
     const first = resolveFirstSend({ mode: "delay", minutes: 31 }, NOW, null, 31 * MIN);
     expect(first).toBe(new Date(2026, 10, 5, 10, 39, 0).getTime());
