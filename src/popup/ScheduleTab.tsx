@@ -109,7 +109,7 @@ export function ScheduleTab(props: ScheduleTabProps) {
   const target = form.override ?? current;
   const bufferSec = draft.bufferOn ? draft.bufferSec : 0;
   const intervalMs = spacingMs(draft.intervalMin, bufferSec);
-  const delayMin = form.delayMin ?? Math.max(MIN_FIRST_SEND_MIN, Math.ceil(intervalMs / 60_000));
+  const delayMin = form.delayMin ?? MIN_FIRST_SEND_MIN;
   const slotsFree = Math.max(0, limit - queue.length);
   const count = form.count ?? Math.min(OPTIONS.defaultCount, slotsFree);
   const lastQueued = target ? lastQueuedAt(queue, target.channelId, draft.content) : null;
