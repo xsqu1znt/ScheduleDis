@@ -4,11 +4,21 @@
 
 Discord lets you schedule messages one at a time. ScheduleDis lets you set up a whole run at once: pick a message, how many times to send it, and how far apart. It's handy for reminders, repeating posts and commands for bots with a cooldown.
 
-**[⬇ Download ScheduleDis](../../releases/latest/download/ScheduleDis.zip)**
+**[⬇ Download for Chrome, Edge and Brave](../../releases/latest/download/ScheduleDis.zip)** · **[⬇ Download for Firefox](../../releases/latest/download/ScheduleDis-firefox.xpi)**
 
-Works in Chrome, Edge, Brave and similar browsers, using Discord in the browser (not the desktop app). Your account needs Discord's scheduled messages feature.
+Works in Chrome, Edge, Brave, similar browsers and Firefox 140 or newer, using Discord in the browser (not the desktop app). Your account needs Discord's scheduled messages feature.
 
 ## Install
+
+### Firefox
+
+1. Download the Firefox file above.
+2. Type `about:addons` in your address bar and press Enter.
+3. Click the gear icon, choose **Install Add-on From File**, pick the file you downloaded, and click **Add**.
+
+To keep it handy, click the puzzle piece icon in your toolbar, click the gear next to ScheduleDis, and choose **Pin to Toolbar**.
+
+### Chrome, Edge and Brave
 
 1. Download the zip above and unzip it. Keep the `ScheduleDis` folder somewhere you won't delete it, because your browser keeps using it.
 2. Type `chrome://extensions` in your address bar and press Enter.
@@ -42,7 +52,8 @@ Keep the Discord tab open until scheduling finishes. You can close the popup. Di
 
 - **Slots:** Discord limits how many messages you can have scheduled at once. It's 10 without Nitro and more with it. The number you have is shown at the top right.
 - **Text only:** ScheduleDis can't schedule images or files.
-- **Updating:** when a new version is out, an **Update** button appears at the top right of the popup. Click it and ScheduleDis installs the update and restarts itself. The first time, it asks you to choose your `ScheduleDis` folder and allow changes to it. Your browser may ask you to allow it again after a restart.
+- **Updating in Firefox:** Firefox installs new versions by itself.
+- **Updating in Chrome, Edge and Brave:** when a new version is out, an **Update** button appears at the top right of the popup. Click it and ScheduleDis installs the update and restarts itself. The first time, it asks you to choose your `ScheduleDis` folder and allow changes to it. Your browser may ask you to allow it again after a restart.
 - **Updating by hand:** some browsers, including Brave by default, don't let extensions change their own files. The update page then gives you the download link: replace the contents of your `ScheduleDis` folder, then click the reload icon on ScheduleDis in `chrome://extensions`.
 
 ## If something's not working
@@ -55,6 +66,6 @@ Keep the Discord tab open until scheduling finishes. You can close the popup. Di
 
 ## Privacy and risk
 
-ScheduleDis runs only on Discord's site, in your own browser. It never sees your password or login token, and it doesn't send your data anywhere except Discord. Your settings and presets stay in your browser. It also asks GitHub whether a new version is out, and downloads it from there when you click **Update**.
+ScheduleDis runs only on Discord's site, in your own browser. It never sees your password or login token, and it doesn't send your data anywhere except Discord. Your settings and presets stay in your browser. It also asks GitHub whether a new version is out, and downloads it from there when you click **Update**. In Firefox, the browser does this by itself.
 
 ScheduleDis is an unofficial tool, and it isn't made by or affiliated with Discord. Discord's rules restrict automating user accounts, so **use it at your own risk**.
