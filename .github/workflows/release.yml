@@ -1,5 +1,5 @@
 # Builds the public ScheduleDis.zip from a version tag and publishes it as a GitHub release.
-# `pnpm release` pushes the tag. The README's download link relies on the zip keeping this name.
+# `pnpm release` pushes the tag. The README's download link and the in-app updater rely on the zip keeping this name.
 name: Release
 
 on:

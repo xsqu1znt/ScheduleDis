@@ -42,7 +42,8 @@ Keep the Discord tab open until scheduling finishes. You can close the popup. Di
 
 - **Slots:** Discord limits how many messages you can have scheduled at once. It's 10 without Nitro and more with it. The number you have is shown at the top right.
 - **Text only:** ScheduleDis can't schedule images or files.
-- **Updating:** download the new zip, replace the contents of your `ScheduleDis` folder, then click the reload icon on ScheduleDis in `chrome://extensions`.
+- **Updating:** when a new version is out, an **Update** button appears at the top right of the popup. Click it and ScheduleDis installs the update and restarts itself. The first time, it asks you to choose your `ScheduleDis` folder and allow changes to it. Your browser may ask you to allow it again after a restart.
+- **Updating by hand:** some browsers, including Brave by default, don't let extensions change their own files. The update page then gives you the download link: replace the contents of your `ScheduleDis` folder, then click the reload icon on ScheduleDis in `chrome://extensions`.
 
 ## If something's not working
 
@@ -54,6 +55,6 @@ Keep the Discord tab open until scheduling finishes. You can close the popup. Di
 
 ## Privacy and risk
 
-ScheduleDis runs only on Discord's site, in your own browser. It never sees your password or login token, and it doesn't send your data anywhere except Discord. Your settings and presets stay in your browser.
+ScheduleDis runs only on Discord's site, in your own browser. It never sees your password or login token, and it doesn't send your data anywhere except Discord. Your settings and presets stay in your browser. It also asks GitHub whether a new version is out, and downloads it from there when you click **Update**.
 
 ScheduleDis is an unofficial tool, and it isn't made by or affiliated with Discord. Discord's rules restrict automating user accounts, so **use it at your own risk**.

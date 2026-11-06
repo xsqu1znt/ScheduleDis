@@ -6,6 +6,8 @@ import type { JobRequest, JobStatus, PageApi, QueuedMessage, Snapshot, Target } 
 // messages list updates live. Module ids change every build, so everything is found by the strings
 // in its source. If one of those disappears the popup says so instead of guessing.
 
+declare const __VERSION__: string;
+
 type Factory = (...args: unknown[]) => unknown;
 type WebpackRequire = { m: Record<string, Factory>; c: Record<string, { exports: unknown } | undefined> };
 type Callable = (...args: unknown[]) => unknown;
@@ -274,6 +276,8 @@ async function runJob(d: Internals, { channelId, content, times }: JobRequest) {
 }
 
 const api: PageApi = {
+  version: () => __VERSION__,
+
   snapshot(): Snapshot {
     const d = getInternals();
     if (!d) return missing ? { status: "unsupported", missing } : { status: "loading" };
@@ -352,5 +356,12 @@ const api: PageApi = {
   },
 };
 
-// Re-injected on every poll so a reloaded tab recovers by itself. The first instance stays, since it holds the job.
-window.__massSchedule ??= api;
+function isRunningJob(instance: PageApi) {
+  const snapshot = instance.snapshot();
+  return snapshot.status === "ready" && snapshot.job.running;
+}
+
+// Re-injected on every poll so a reloaded tab recovers by itself. The first instance stays, since it holds the job,
+// until an update changes the version. Then this one takes over as soon as no job is running, without a tab reload.
+const existing = window.__massSchedule;
+if (!existing || (existing.version() !== api.version() && !isRunningJob(existing))) window.__massSchedule = api;

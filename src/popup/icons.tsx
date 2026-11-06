@@ -57,3 +57,11 @@ export function CheckIcon() {
     </svg>
   );
 }
+
+export function DownloadIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" {...stroke} strokeWidth="2.5">
+      <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
+    </svg>
+  );
+}

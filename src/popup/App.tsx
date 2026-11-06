@@ -5,6 +5,7 @@ import type { Preset } from "../lib/storage";
 import { PresetsTab } from "./PresetsTab";
 import { QueueTab } from "./QueueTab";
 import { EMPTY_FORM, ScheduleTab, type ScheduleForm } from "./ScheduleTab";
+import { UpdateButton } from "./UpdateButton";
 import { useDraft } from "./useDraft";
 import { usePage } from "./usePage";
 
@@ -12,7 +13,8 @@ type Tab = "schedule" | "presets" | "queued";
 
 function Message({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
-    <div className="px-5 py-8 text-center">
+    <div className="relative px-5 py-8 text-center">
+      <UpdateButton className="absolute top-2.5 right-2.5" />
       <p className="font-medium">{title}</p>
       {children && <div className="text-muted mt-1.5 text-xs leading-relaxed">{children}</div>}
     </div>
@@ -80,6 +82,7 @@ export function App() {
           {snapshot.limit > BASE_SLOTS && <img src="icons/nitro.png" alt="Nitro" className="size-4" />}
           {snapshot.queue.length} of {snapshot.limit} slots
         </span>
+        <UpdateButton className="mb-1.5" />
       </header>
 
       {tab === "schedule" && (

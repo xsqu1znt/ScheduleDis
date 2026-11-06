@@ -49,6 +49,7 @@ export type Snapshot =
 
 /** What the page script exposes on `window.__massSchedule`. Everything must be JSON-serializable. */
 export interface PageApi {
+  version(): string;
   snapshot(): Snapshot;
   refresh(): Promise<void>;
   start(job: JobRequest): void;
