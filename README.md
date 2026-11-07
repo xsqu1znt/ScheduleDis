@@ -50,7 +50,7 @@ Keep the Discord tab open until scheduling finishes. You can close the popup. Di
 
 ## Good to know
 
-- **Slots:** Discord limits how many messages you can have scheduled at once. It's 10 without Nitro and more with it. The number you have is shown at the top right.
+- **Slots:** Discord currently allows 1 scheduled message without Nitro and 25 with Nitro. ScheduleDis reads your limit from Discord and shows it at the top right.
 - **Text only:** ScheduleDis can't schedule images or files.
 - **Updating in Firefox:** Firefox installs new versions by itself.
 - **Updating in Chrome, Edge and Brave:** when a new version is out, an **Update** button appears at the top right of the popup. Click it and ScheduleDis installs the update and restarts itself. The first time, it asks you to choose your `ScheduleDis` folder and allow changes to it. Your browser may ask you to allow it again after a restart.

@@ -39,7 +39,7 @@ interface Internals {
   create: (args: { channelId: string; scheduledTimestamp: string; messageSendData: unknown }) => Promise<unknown>;
   remove: (id: string) => Promise<unknown>;
   fetchAll: () => Promise<void>;
-  getLimit: ((location: string) => { limit: number }) | null;
+  getLimit: () => { limit: number };
   scheduled: { getScheduledMessagesForInbox(): Record<string, RawScheduled>; getMessagesPendingRemoval(): Set<string> };
   channels: { getChannel(id: string): RawChannel | undefined };
   guilds: { getGuild(id: string): { name: string } | undefined };
@@ -51,8 +51,6 @@ const OPTIONS = {
   cancelPaceMs: 600,
   // For cancels only. Creates wait as long as Discord asks, since the run is still valid afterwards.
   rateLimitRetries: 4,
-  // Only used if Discord's own limit lookup can't be found. The server still enforces the real one.
-  fallbackLimit: 10,
   tooManyScheduledCode: 640003,
   stopCheckMs: 250,
   discordEpochMs: 1420070400000,
@@ -61,7 +59,7 @@ const OPTIONS = {
 
 const NEEDLES = {
   actions: "SCHEDULED_MESSAGES_CREATE_START",
-  limit: "Config is missing scheduled message limit",
+  limit: "SCHEDULED_MESSAGE_TIME_PICKER_OPENED",
   scheduled: 'displayName="scheduledMessageStore"',
   channels: 'displayName="ChannelStore"',
   guilds: 'displayName="GuildStore"',
@@ -118,6 +116,15 @@ function findStore(module: unknown, method: string) {
   );
 }
 
+/** Finds the direct limit lookup, excluding the React hook that reads the same user and tier. */
+function findLimit(module: unknown) {
+  return exportsOf(module).find(e => {
+    if (typeof e !== "function") return false;
+    const source = Function.prototype.toString.call(e);
+    return source.includes("getCurrentUser") && source.includes("TIER_2") && !source.includes("=>");
+  });
+}
+
 let cached: Internals | null = null;
 let missing: string | null = null;
 
@@ -134,6 +141,7 @@ function getInternals(): Internals | null {
     create: findFunction(actions, "SCHEDULED_MESSAGES_CREATE_START"),
     remove: findFunction(actions, "SCHEDULED_MESSAGES_DELETE_START"),
     fetchAll: findFunction(actions, "FETCH_SCHEDULED_MESSAGES"),
+    getLimit: findLimit(modules.get(NEEDLES.limit)),
     scheduled: findStore(modules.get(NEEDLES.scheduled), "getScheduledMessagesForInbox"),
     channels: findStore(modules.get(NEEDLES.channels), "getChannel"),
     guilds: findStore(modules.get(NEEDLES.guilds), "getGuild"),
@@ -148,10 +156,7 @@ function getInternals(): Internals | null {
   }
 
   missing = null;
-  cached = {
-    ...parts,
-    getLimit: findFunction(modules.get(NEEDLES.limit), "TIER_2", "getConfig") ?? null,
-  } as Internals;
+  cached = parts as Internals;
   return cached;
 }
 
@@ -301,7 +306,7 @@ const api: PageApi = {
     const channelId = currentChannelId();
     return {
       status: "ready",
-      limit: d.getLimit?.("ScheduledMessagesCreateRoadblock").limit ?? OPTIONS.fallbackLimit,
+      limit: d.getLimit().limit,
       current: channelId ? describeTarget(d, channelId) : null,
       queue,
       queueLoaded,

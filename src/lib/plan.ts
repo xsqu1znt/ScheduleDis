@@ -32,7 +32,7 @@ export const RULES = {
 export const MIN_FIRST_SEND_MIN = (RULES.minLeadMs + RULES.marginMs) / MINUTE;
 
 /** Slots on an account without Nitro. A higher limit from Discord means the account has Nitro. */
-export const BASE_SLOTS = 10;
+export const BASE_SLOTS = 1;
 
 /**
  * Gap between sends: the bot's cooldown plus a buffer. Every gap includes the buffer, so it stacks:
