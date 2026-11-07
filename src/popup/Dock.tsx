@@ -39,13 +39,13 @@ function TrayContent({ target, onUseOpenChannel, job, now, count, sendsAvailable
     const next = job.waitingUntil === null ? "" : `next in ${formatInterval(Math.max(1000, job.waitingUntil - now))}, `;
     return (
       <>
-        <span>
+        <span className="min-w-0 flex-1">
           Scheduling{" "}
           <b className="text-ink font-medium whitespace-nowrap">
             {job.done} of {job.total}
           </b>
         </span>
-        <span className="ml-auto shrink-0" title="You can close this popup, but keep the Discord tab open.">
+        <span className="ml-auto min-w-0 flex-1 text-right" title="You can close this popup, but keep the Discord tab open.">
           {next}keep Discord open
         </span>
       </>
@@ -60,9 +60,11 @@ function TrayContent({ target, onUseOpenChannel, job, now, count, sendsAvailable
 
   return (
     <>
-      <span className="text-faint text-sm leading-none">{target.guildName ? "#" : "@"}</span>
-      <b className="text-ink font-medium whitespace-nowrap">{target.channelName}</b>
-      <span className="min-w-0 truncate">{target.guildName ?? "Direct message"}</span>
+      <span className="flex min-w-0 flex-[1_1_160px] items-center gap-1.5">
+        <span className="text-faint shrink-0 text-sm leading-none">{target.guildName ? "#" : "@"}</span>
+        <b className="text-ink min-w-0 max-w-[60%] truncate font-medium" title={target.channelName}>{target.channelName}</b>
+        <span className="min-w-0 flex-1 truncate" title={target.guildName ?? "Direct message"}>{target.guildName ?? "Direct message"}</span>
+      </span>
       {onUseOpenChannel && (
         <button type="button" className="text-accent-soft ml-1.5 shrink-0 font-medium hover:underline" onClick={onUseOpenChannel}>
           Use open channel
@@ -99,7 +101,7 @@ export function Dock(props: DockProps) {
   return (
     <div className="relative z-20 shrink-0 px-3 pb-3">
       <div className={`channel-tray ${job.running ? "running" : ""}`}>
-        <div className="flex w-full min-w-0 items-center gap-1.5">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-1.5">
           <TrayContent {...props} />
         </div>
         <span className="tray-fill" style={{ width: `${progress}%` }} />

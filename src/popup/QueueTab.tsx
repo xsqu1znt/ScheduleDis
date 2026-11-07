@@ -34,14 +34,14 @@ export function QueueTab({ tabId, now, queue, loaded }: QueueTabProps) {
 
   return (
     <div className="flex min-h-0 flex-col gap-2.5 p-3.5">
-      <ol className="bg-panel grid min-h-0 grid-cols-[max-content_minmax(0,1fr)_auto] overflow-y-auto rounded-lg py-1">
+      <ol className="bg-panel grid min-h-0 grid-cols-[minmax(0,1fr)_auto] overflow-y-auto rounded-lg py-1 min-[440px]:grid-cols-[max-content_minmax(0,1fr)_auto]">
         {queue.map(q => (
           <li key={q.id} className="col-span-full grid grid-cols-subgrid items-center gap-x-3 py-1 pr-1.5 pl-3 tabular-nums">
-            <span className="whitespace-nowrap">
+            <span className="min-w-0 min-[440px]:whitespace-nowrap">
               {formatSendTime(q.sendAt, now)}
               {q.failed ? <span className="text-bad ml-1.5 text-xs">Failed</span> : <span className="text-muted ml-1.5 text-xs">in {formatDuration(q.sendAt - now)}</span>}
             </span>
-            <span className="text-muted flex min-w-0 gap-1 text-xs">
+            <span className="text-muted col-start-1 row-start-2 flex min-w-0 gap-1 text-xs min-[440px]:col-start-auto min-[440px]:row-start-auto">
               <span className="text-ink truncate">{q.content}</span>
               <span className="shrink-0">in</span>
               <TargetName {...q} />
@@ -50,7 +50,7 @@ export function QueueTab({ tabId, now, queue, loaded }: QueueTabProps) {
               type="button"
               aria-label={`Cancel ${q.content} at ${formatSendTime(q.sendAt, now)}`}
               disabled={busy}
-              className="text-faint hover:bg-danger size-[26px] rounded-md hover:text-white disabled:opacity-30"
+              className="text-faint hover:bg-danger col-start-2 row-span-2 row-start-1 size-[26px] rounded-md hover:text-white disabled:opacity-30 min-[440px]:col-start-auto min-[440px]:row-span-1 min-[440px]:row-start-auto"
               onClick={() => void cancel([q.id])}
             >
               ✕

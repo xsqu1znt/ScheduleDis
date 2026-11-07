@@ -74,15 +74,17 @@ export function App() {
 
   return (
     <div className="relative isolate flex max-h-[600px] flex-col overflow-hidden">
-      <header className="border-line relative z-10 mx-3.5 flex shrink-0 items-center gap-4 border-b pt-3">
-        {tabButton("schedule", "Schedule")}
-        {tabButton("presets", "Presets", draft.presets.length)}
-        {tabButton("queued", "Queued", snapshot.queue.length)}
-        <span className="text-muted ml-auto flex items-center gap-1.5 pb-2 text-xs tabular-nums">
+      <header className="border-line relative z-10 mx-3.5 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-1 border-b pt-3">
+        <div role="tablist" aria-label="ScheduleDis" className="flex w-full gap-4 min-[440px]:w-auto">
+          {tabButton("schedule", "Schedule")}
+          {tabButton("presets", "Presets", draft.presets.length)}
+          {tabButton("queued", "Queued", snapshot.queue.length)}
+        </div>
+        <span className="text-muted flex items-center gap-1.5 pb-2 text-xs tabular-nums min-[440px]:ml-auto">
           {snapshot.limit > BASE_SLOTS && <img src="icons/nitro.png" alt="Nitro" className="size-4" />}
           {snapshot.queue.length} of {snapshot.limit} slots
         </span>
-        <UpdateButton className="mb-1.5" />
+        <UpdateButton className="mb-1.5 ml-auto min-[440px]:ml-0" />
       </header>
 
       {tab === "schedule" && (

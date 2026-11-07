@@ -54,7 +54,7 @@ export function Stepper({ label, value, min, max, suffix, onChange }: StepperPro
         onKeyDown={e => e.key === "Enter" && commit()}
         className="w-full min-w-0 bg-transparent text-center font-medium tabular-nums outline-none"
       />
-      {suffix && <span className="text-muted pr-0.5 text-xs">{suffix}</span>}
+      {suffix && <span className="text-muted shrink-0 pr-0.5 text-xs">{suffix}</span>}
       <button type="button" aria-label={`Increase ${label}`} className={stepClass} disabled={value >= max} onClick={() => onChange(clamp(value + 1))}>
         +
       </button>
@@ -157,8 +157,8 @@ export function HoldButton({ label, disabled, onConfirm }: { label: string; disa
 
 export function FieldLabel({ children, aside }: { children: ReactNode; aside?: ReactNode }) {
   return (
-    <div className="text-muted mb-1.5 flex min-h-[17px] items-baseline justify-between gap-2 text-xs font-medium">
-      <span>{children}</span>
+    <div className="text-muted mb-1.5 flex min-h-[17px] flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5 text-xs font-medium">
+      <span className="shrink-0">{children}</span>
       {aside && <span className="font-normal tabular-nums">{aside}</span>}
     </div>
   );

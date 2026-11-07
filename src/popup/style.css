@@ -32,6 +32,9 @@
 
   body {
     width: 480px;
+    /* Percentages preserve the desktop popup's intrinsic width while fitting mobile screens. */
+    max-width: 100%;
+    overflow-wrap: anywhere;
     background: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);

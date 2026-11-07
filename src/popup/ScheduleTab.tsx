@@ -75,7 +75,7 @@ function SendTimes({ times, now }: { times: number[]; now: number }) {
   let shownDay: string | null = null;
 
   return (
-    <ol className="bg-soft mt-2 grid max-h-[124px] grid-cols-2 gap-x-3.5 overflow-x-hidden overflow-y-auto rounded-lg px-1 py-1.5 tabular-nums">
+    <ol className="bg-soft mt-2 grid max-h-[124px] grid-cols-1 gap-x-3.5 overflow-y-auto rounded-lg px-1 py-1.5 tabular-nums min-[440px]:grid-cols-2">
       {times.flatMap((t, i) => {
         const day = formatDay(t, now);
         const heading = multiDay && day !== shownDay;
@@ -285,7 +285,7 @@ export function ScheduleTab(props: ScheduleTabProps) {
                     aria-selected={selected}
                     disabled={disabled}
                     title={disabled ? (t.mode === "after-last" ? "Nothing is queued for this message yet" : OVERLAP_NOTE) : undefined}
-                    className={`h-[30px] rounded-[7px] text-xs font-medium whitespace-nowrap transition-colors disabled:cursor-not-allowed ${
+                    className={`min-h-[30px] rounded-[7px] px-1 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed ${
                       selected ? "bg-accent text-white" : "text-muted hover:not-disabled:bg-softer hover:not-disabled:text-ink disabled:opacity-35"
                     }`}
                     onClick={() => chooseMode(t.mode)}
@@ -303,11 +303,11 @@ export function ScheduleTab(props: ScheduleTabProps) {
                   type="time"
                   value={form.clock}
                   onChange={e => setForm({ clock: e.target.value })}
-                  className="time-input bg-field h-9 w-full rounded-lg pr-2.5 pl-3 font-medium tabular-nums"
+                  className="time-input bg-field h-9 min-w-0 w-full rounded-lg pr-2.5 pl-3 font-medium tabular-nums"
                 />
               )}
               {mode === "after-last" && (
-                <div className="bg-field flex h-9 w-full items-center rounded-lg px-3 text-[13px] font-medium tabular-nums">{formatInterval(intervalMs)} after your last scheduled message</div>
+                <div className="bg-field flex min-h-9 w-full items-center rounded-lg px-3 py-1 text-[13px] font-medium tabular-nums">{formatInterval(intervalMs)} after your last scheduled message</div>
               )}
             </div>
           </div>
@@ -315,7 +315,7 @@ export function ScheduleTab(props: ScheduleTabProps) {
 
         {firstAt !== undefined && lastAt !== undefined && (
           <section>
-            <div className="text-muted flex items-center justify-between gap-2 text-[13px]">
+            <div className="text-muted flex flex-wrap items-center justify-between gap-2 text-[13px]">
               <span>
                 {times.length > 1 ? (
                   <>

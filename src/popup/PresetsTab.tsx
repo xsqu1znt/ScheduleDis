@@ -27,8 +27,8 @@ export function PresetsTab({ presets, onLoad, onRemove }: PresetsTabProps) {
   return (
     <ul className="flex min-h-0 flex-col gap-1.5 overflow-y-auto p-3.5">
       {presets.map(p => (
-        <li key={`${p.channelId}:${p.content}`} className="bg-soft hover:bg-softer flex items-center gap-1 rounded-lg py-1 pr-2 pl-1">
-          <button type="button" aria-label={`Remove preset ${p.content}`} title="Remove preset" className="star-button text-warn" onClick={() => onRemove(p)}>
+        <li key={`${p.channelId}:${p.content}`} className="bg-soft hover:bg-softer grid grid-cols-[32px_minmax(0,1fr)] items-center gap-x-1 rounded-lg py-1 pr-2 pl-1 min-[440px]:grid-cols-[32px_minmax(0,1fr)_auto]">
+          <button type="button" aria-label={`Remove preset ${p.content}`} title="Remove preset" className="star-button text-warn row-span-2 min-[440px]:row-span-1" onClick={() => onRemove(p)}>
             <StarIcon filled />
           </button>
           <button type="button" className="min-w-0 flex-1 p-1 text-left" onClick={() => onLoad(p)}>
@@ -37,7 +37,7 @@ export function PresetsTab({ presets, onLoad, onRemove }: PresetsTabProps) {
               {p.guildName ? `#${p.channelName} · ${p.guildName}` : `@${p.channelName}`}
             </small>
           </button>
-          <span className="text-muted text-xs whitespace-nowrap tabular-nums">
+          <span className="text-muted col-start-2 px-1 pb-1 text-xs tabular-nums min-[440px]:col-start-auto min-[440px]:p-0">
             {p.count} × every {formatInterval(spacingMs(p.intervalMin, p.bufferSec))}
           </span>
         </li>
